@@ -6,9 +6,12 @@ export async function insertIntoUsersTable(email: string, password: string) {
     const query =
       "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *";
     const values = [email, password];
-    const result = await client.query(query, values);
+    const res = await client.query(query, values);
 
-    return result.rows[0]; // Return the inserted user object
+    return {
+      id: res.rows[0].id,
+      email: res.rows[0].email,
+    };
   } catch (error) {
     console.error("Error inserting user:", error);
     throw error;
@@ -26,11 +29,11 @@ export async function insertIntoTodosTable(
   const client = await pool.connect();
   try {
     const query =
-      "INSERT INTO todos (title, description, user_id) VALUES ($1, $2, $3)";
+      "INSERT INTO todos (title, description, user_id) VALUES ($1, $2, $3) RETURNING *";
     const values = [title, description, userId];
     const res = await client.query(query, values);
-    console.log(res);
-    return res.rowCount !== 0;
+
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw error;
@@ -88,13 +91,13 @@ export async function getTodos(userId: number) {
   }
 }
 
-export async function deleteTodos(todoId: number, userId: number) {
+export async function deleteTodos(userId: number, todoId: number) {
   const client = await pool.connect();
   try {
-    const query = `DELETE FROM TODOS WHERE user_id=$1 and id=$2`;
+    const query = `DELETE FROM TODOS WHERE user_id=$1 AND id=$2 RETURNING *`;
     const res = await client.query(query, [userId, todoId]);
     console.log(`Deleted ${res.rowCount} row(s)`);
-    return res.rowCount !== 0;
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw error;
@@ -113,13 +116,16 @@ export async function getUser(email: string, password: string) {
     if (res.rows.length === 0) {
       return null;
     }
-    return res.rows[0];
+
+    return {
+      id: res.rows[0].id,
+      email: res.rows[0].email,
+    };
   } catch (error) {
     console.error(error);
     throw error;
   } finally {
     client.release();
-    console.log("Disconnected from PostgreSQL");
     console.log("Disconnected from PostgreSQL");
   }
 }

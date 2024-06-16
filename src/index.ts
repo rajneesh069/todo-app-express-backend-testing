@@ -16,6 +16,13 @@ app.use(
   })
 );
 
+app.use("/users", userRouter);
+app.use("/users", todoRouter);
+
+app.get("/", async (_req: Request, res: Response) => {
+  res.send("Working");
+});
+
 app.use((_req: Request, res: Response, _next: NextFunction) => {
   res.status(404).send({ error: "Route not found" });
 });
@@ -23,13 +30,6 @@ app.use((_req: Request, res: Response, _next: NextFunction) => {
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   res.status(500).send({ error: "Something went wrong!" });
-});
-
-app.use("/users", userRouter);
-app.use("/users", todoRouter);
-
-app.get("/", async (_req: Request, res: Response) => {
-  res.send("Working");
 });
 
 app.listen(PORT, async () => {
