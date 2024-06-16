@@ -1,18 +1,20 @@
-import client from "./index";
+import pool from "./index";
 
 export async function insertIntoUsersTable(email: string, password: string) {
+  const client = await pool.connect();
   try {
-    await client.connect();
-    const query = "INSERT INTO users (email, password) VALUES ($1, $2)";
+    const query =
+      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *";
     const values = [email, password];
-    const user = await client.query(query, values);
-    console.log(user);
-    return user.rowCount !== 0;
+    const result = await client.query(query, values);
+
+    return result.rows[0]; // Return the inserted user object
   } catch (error) {
-    console.error(error);
+    console.error("Error inserting user:", error);
     throw error;
   } finally {
-    await client.end();
+    client.release();
+    console.log("Disconnected from PostgreSQL");
   }
 }
 
@@ -21,9 +23,8 @@ export async function insertIntoTodosTable(
   description: string,
   userId: number
 ) {
+  const client = await pool.connect();
   try {
-    await client.connect();
-
     const query =
       "INSERT INTO todos (title, description, user_id) VALUES ($1, $2, $3)";
     const values = [title, description, userId];
@@ -34,13 +35,14 @@ export async function insertIntoTodosTable(
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    client.release();
+    console.log("Disconnected from PostgreSQL");
   }
 }
 
 export async function getTodo(userId: number, todoId: number) {
+  const client = await pool.connect();
   try {
-    await client.connect();
     const query = `
       SELECT * FROM todos
       WHERE user_id = $1 AND id = $2
@@ -57,13 +59,14 @@ export async function getTodo(userId: number, todoId: number) {
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    client.release();
+    console.log("Disconnected from PostgreSQL");
   }
 }
 
 export async function getTodos(userId: number) {
+  const client = await pool.connect();
   try {
-    await client.connect();
     const query = `
       SELECT * FROM todos
       WHERE user_id = $1
@@ -75,18 +78,19 @@ export async function getTodos(userId: number) {
       return null;
     }
 
-    return res.rows[0];
+    return res.rows;
   } catch (error) {
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    client.release();
+    console.log("Disconnected from PostgreSQL");
   }
 }
 
 export async function deleteTodos(todoId: number, userId: number) {
+  const client = await pool.connect();
   try {
-    await client.connect();
     const query = `DELETE FROM TODOS WHERE user_id=$1 and id=$2`;
     const res = await client.query(query, [userId, todoId]);
     console.log(`Deleted ${res.rowCount} row(s)`);
@@ -95,13 +99,14 @@ export async function deleteTodos(todoId: number, userId: number) {
     console.error(error);
     throw error;
   } finally {
-    client.end();
+    client.release();
+    console.log("Disconnected from PostgreSQL");
   }
 }
 
 export async function getUser(email: string, password: string) {
+  const client = await pool.connect();
   try {
-    await client.connect();
     const query = `SELECT * FROM users WHERE email=$1 AND password=$2`;
     const values = [email, password];
     const res = await client.query(query, values);
@@ -113,6 +118,8 @@ export async function getUser(email: string, password: string) {
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    client.release();
+    console.log("Disconnected from PostgreSQL");
+    console.log("Disconnected from PostgreSQL");
   }
 }

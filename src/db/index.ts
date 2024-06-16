@@ -1,12 +1,11 @@
-import pg from "pg";
-const { Client } = pg;
+import { Pool } from "pg";
 
-const client = new Client({
-  database: "todos",
+const pool = new Pool({
+  database: "postgres",
   user: "rajneesh",
   password: "12345",
   port: 5432,
   host: "localhost",
 });
 
-export default client;
+export default pool;

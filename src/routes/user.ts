@@ -3,19 +3,18 @@ import { getUser, insertIntoUsersTable } from "../db/queries";
 
 const router = Router();
 
-router.post("/signup", async (req: Request, res: Response) => {
+
+router.post('/signup', async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
     const user = await insertIntoUsersTable(email, password);
     if (user) {
-      return res
-        .json({ user, message: "User created successfully" })
-        .status(200);
+      return res.status(200).json({ user, message: 'User created successfully' });
     }
-    return res.status(400).json({ message: "Can't create user." });
+    return res.status(400).json({ message: 'Can\'t create user.' });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server error" });
+    console.error('Error creating user:', error);
+    return res.status(500).json({ message: 'Internal Server error' });
   }
 });
 

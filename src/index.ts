@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import todoRouter from "./routes/todo";
 import userRouter from "./routes/user";
@@ -16,18 +16,23 @@ app.use(
   })
 );
 
+app.use((_req: Request, res: Response, _next: NextFunction) => {
+  res.status(404).send({ error: "Route not found" });
+});
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).send({ error: "Something went wrong!" });
+});
+
 app.use("/users", userRouter);
 app.use("/users", todoRouter);
 
-createTables()
-  .then((result) => {
-    console.log(result);
-  })
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+app.get("/", async (_req: Request, res: Response) => {
+  res.send("Working");
+});
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await createTables();
   console.log(`The server is running at http://localhost:${PORT}`);
 });
