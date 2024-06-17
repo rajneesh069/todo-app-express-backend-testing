@@ -25,12 +25,12 @@ router.post("/signin", async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const user: User | null = await getUser(email, password);
     if (user) {
-      return res.json({ message: "User signed in", user }).status(200);
+      return res.status(200).json({ message: "User signed in", user });
     }
-    return res.json({ message: "Can't find user." }).json(404);
+    return res.status(404).json({ message: "Can't find user." });
   } catch (error) {
     console.error(error);
-    return res.json({ message: "Internal Server Error" }).status(500);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

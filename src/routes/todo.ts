@@ -13,15 +13,15 @@ router.get("/:userId/todos", async (req: Request, res: Response) => {
   const { userId } = req.params;
   try {
     const todos: Todo[] | null = await getTodos(parseInt(userId));
-    if (todos) return res.json({ todos, message: "Todos found." }).status(200);
-    return res.json({ message: "No todos found" }).status(404);
+    if (todos) return res.status(200).json({ todos, message: "Todos found." });
+    return res.status(404).json({ message: "No todos found" });
   } catch (error) {
     console.error(error);
-    return res.json({ message: error }).status(500);
+    return res.status(500).json({ message: error });
   }
 });
 
-router.get("/:userId/todo/:todoId", async (req: Request, res: Response) => {
+router.get("/:userId/todos/:todoId", async (req: Request, res: Response) => {
   const { userId, todoId } = req.params;
   try {
     const todo: Todo = await getTodo(parseInt(userId), parseInt(todoId));
@@ -29,7 +29,7 @@ router.get("/:userId/todo/:todoId", async (req: Request, res: Response) => {
     return res.status(404).json({ message: "No todo found." });
   } catch (error) {
     console.error(error);
-    return res.json({ message: error }).status(500);
+    return res.status(500).json({ message: error });
   }
 });
 
@@ -46,11 +46,11 @@ router.post("/:userId/todo", async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Failed to add todo" });
   } catch (error) {
     console.error(error);
-    return res.json({ error }).status(500);
+    return res.status(500).json({ error });
   }
 });
 
-router.delete("/:userId/todo/:todoId", async (req: Request, res: Response) => {
+router.delete("/:userId/todos/:todoId", async (req: Request, res: Response) => {
   const { userId, todoId } = req.params;
   console.log(parseInt(userId), parseInt(todoId));
   try {
@@ -60,13 +60,13 @@ router.delete("/:userId/todo/:todoId", async (req: Request, res: Response) => {
     );
     if (deletedTodo) {
       return res
-        .json({ message: "Todo deleted successfully", deletedTodo })
-        .status(200);
+        .status(200)
+        .json({ message: "Todo deleted successfully", deletedTodo });
     }
-    return res.json({ message: "Can't delete todo" }).status(400);
+    return res.status(400).json({ message: "Can't delete todo" });
   } catch (error) {
     console.error(error);
-    return res.json({ error }).status(500);
+    return res.status(500).json({ error });
   }
 });
 
